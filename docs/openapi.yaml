@@ -1,0 +1,356 @@
+openapi: 3.0.3
+info:
+  title: Work Order Tracker API
+  version: 1.0.0
+  description: API specification for managing maintenance work orders and user authentication.
+servers:
+  - url: http://localhost:3000
+    description: Local Development Server
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              example:
+                status: ok
+
+  /api/auth/login:
+    post:
+      summary: Authenticate user and receive JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/auth/me:
+    get:
+      summary: Get current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User details retrieved successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/work-orders:
+    get:
+      summary: List all work orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [open, in_progress, blocked, closed]
+          description: Filter work orders by status
+        - in: query
+          name: assignee
+          schema:
+            type: string
+          description: Filter work orders by assigned username
+      responses:
+        '200':
+          description: A list of work orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkOrder'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      summary: Create a new work order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkOrderRequest'
+      responses:
+        '201':
+          description: Work order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/work-orders/{id}:
+    get:
+      summary: Get work order by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Work order found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      summary: Update a work order
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkOrderRequest'
+      responses:
+        '200':
+          description: Work order updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      summary: Delete a work order (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Work order deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    ValidationError:
+      description: Bad Request / Validation Failure
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: title must be at least 3 characters
+              details:
+                - field: title
+                  issue: too_small
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Missing or malformed token
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: FORBIDDEN
+              message: Insufficient permissions
+    NotFoundError:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: NOT_FOUND
+              message: Resource not found
+
+  schemas:
+    WorkOrder:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - status
+        - priority
+        - assignee
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        title:
+          type: string
+          example: "Fix leaking pipe"
+        description:
+          type: string
+          example: "Water leaking under sink"
+        status:
+          type: string
+          enum: [open, in_progress, blocked, closed]
+          example: "open"
+        priority:
+          type: string
+          enum: [low, medium, high]
+          example: "high"
+        assignee:
+          type: string
+          nullable: true
+          example: "tech1"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: admin
+        password:
+          type: string
+          example: Passw0rd!
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        expiresIn:
+          type: integer
+          example: 3600
+
+    CreateWorkOrderRequest:
+      type: object
+      required:
+        - title
+        - description
+        - status
+        - priority
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+          example: "Fix AC Unit"
+        description:
+          type: string
+          maxLength: 2000
+          example: "Leaking water in room 302"
+        status:
+          type: string
+          enum: [open, in_progress, blocked, closed]
+          example: "open"
+        priority:
+          type: string
+          enum: [low, medium, high]
+          example: "medium"
+        assignee:
+          type: string
+          nullable: true
+          example: "tech1"
+
+    UpdateWorkOrderRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [open, in_progress, blocked, closed]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        assignee:
+          type: string
+          nullable: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
