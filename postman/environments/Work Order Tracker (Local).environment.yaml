@@ -1,0 +1,8 @@
+name: Work Order Tracker (Local)
+values:
+  - key: baseUrl
+    value: 'http://localhost:3000'
+  - key: token
+    value: ''
+  - key: createdWorkOrderId
+    value: ''

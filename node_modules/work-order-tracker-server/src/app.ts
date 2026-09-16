@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import YAML from 'yamljs';
 import swaggerUi from 'swagger-ui-express';
@@ -7,6 +8,10 @@ import authRoutes from './routes/auth';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 // Serve OpenAPI Docs

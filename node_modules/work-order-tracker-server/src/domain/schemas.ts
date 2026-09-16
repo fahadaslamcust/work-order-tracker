@@ -16,4 +16,6 @@ export const createWorkOrderSchema = z.object({
 });
 
 // Schema for PATCH /api/work-orders/:id payload
-export const updateWorkOrderSchema = createWorkOrderSchema.partial();
+export const updateWorkOrderSchema = z.object({
+  status: z.enum(['open', 'in_progress', 'blocked', 'closed']),
+});

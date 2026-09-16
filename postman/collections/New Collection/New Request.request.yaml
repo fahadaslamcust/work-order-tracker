@@ -1,8 +1,0 @@
-$kind: http-request
-url: http://localhost:3000/api/work-orders/
-method: GET
-auth:
-  type: bearer
-  credentials:
-    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTU2MzA5MiwiZXhwIjoxNzg5NTY2NjkyfQ.gL0oeGdKsikcMQMS5O5vjvkWJN7haTuG03B5PQY47dc
-order: 1789559727116

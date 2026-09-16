@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/api/work-orders"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "title": "Fix HVAC Unit",
+      "description": "Leaking in hallway",
+      "status": "open",
+      "priority": "high",
+      "assignee": "tech1"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("returns 201 created", () => pm.response.to.have.status(201));
+      const body = pm.response.json();
+      pm.environment.set("createdWorkOrderId", body.id);
+    language: text/javascript
+order: 2000
