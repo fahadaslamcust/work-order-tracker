@@ -37,18 +37,6 @@ export const WorkOrderList: React.FC = () => {
     fetchWorkOrders();
   }, [statusFilter, assigneeFilter]);
 
-  const handleStatusChange = async (id: string, newStatus: string) => {
-    try {
-      await apiFetch<WorkOrder>(`/api/work-orders/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: newStatus }),
-      });
-      fetchWorkOrders();
-    } catch (err: any) {
-      alert(err.message || 'Failed to update status');
-    }
-  };
-
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this work order?')) return;
     try {
@@ -124,7 +112,6 @@ const handleUpdate = async (id: string) => {
               <WorkOrderRow
                 key={wo.id}
                 workOrder={wo}
-                onStatusChange={handleStatusChange}
                 onDelete={handleDelete}
                 onUpdate={handleUpdate}
               />
