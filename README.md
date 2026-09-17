@@ -41,13 +41,7 @@ git clone https://github.com/your_username/work-order-tracker.git
 cd work-order-tracker
 ```
 
-2. Install dependencies in the root, server, and web folders:
-
-```bash
-npm install
-```
-
-3. If you want to run both frontend and backend servers create the environment file:
+2. Create the environment file:
 
 ```bash
  cd work-order-tracker
@@ -58,22 +52,7 @@ The `.env.example` file has these variables:
 
 - `PORT` — the port used by the Express API. It defaults to `3000` when omitted.
 - `JWT_SECRET` — the secret used to sign and verify JWT access tokens. The server exits during startup if this variable is missing.
-4. If you want to run the frontend server only create the environment file:
-
-```bash
- cd work-order-tracker\web
- cp .env.example .env
-```
-The `.env.example` file has this variable:
-- `VITE_API_BASE_URL`: It's a frontend environment variable, specifically for a Vite project. It holds the base URL your frontend uses to reach the backend API — e.g. http://localhost:4000.
-5. If you want to run the backend server only create the environment file:
-
-```bash
- cd work-order-tracker\web
- cp .env.example .env
-```
-The `.env.example` file has the same variables as the root folder
-
+3. Assign the JWT_SECRET your own value in the .env file
 ## Running the app
 
 Start both the API server and web client from the repository root:
