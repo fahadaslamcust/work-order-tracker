@@ -2,6 +2,12 @@
 workspace:
   id: cfd79d58-f05b-417d-8e66-91fdf95d1629
 
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/Work Order Tracker API: d1afaed6-deb1-4b55-b968-cd9560dc26a6
+
 # All resources in the `postman/` folder are automatically registered in Local View.
 # Point to additional files outside the `postman/` folder to register them individually. Example:
 #localResources:

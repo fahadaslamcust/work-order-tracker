@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/api/work-orders/{{createdWorkOrderId}}"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "status": "in_progress"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test("updates work order", () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 4000
